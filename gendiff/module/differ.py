@@ -15,7 +15,7 @@ def generate_diff(first_file, second_file):
         string: Difference in string representation.
     """
     source_json = json.loads(read_file(first_file))
-    compare_json = json.load(read_file(second_file))
+    compare_json = json.loads(read_file(second_file))
     diff = get_diff(source_json, compare_json)
     return '\n'.join(chain('{', diff, '}'))
 
