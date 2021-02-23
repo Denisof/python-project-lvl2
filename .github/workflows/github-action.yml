@@ -27,6 +27,7 @@ jobs:
     - name: Test with Pytest
       run: |
         make test
+    - name: Generate testcoverage repost
       run: |
         make test-coverage
     - name: Publish code coverage
