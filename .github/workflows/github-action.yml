@@ -27,3 +27,7 @@ jobs:
     - name: Test with Pytest
       run: |
         make test
+     - name: Publish code coverage
+      uses: paambaati/codeclimate-action@v2.7.5
+      env:
+        CC_TEST_REPORTER_ID: a17779188c2191f25b0dc476a267d3abfb2b8451d95161610e0617e0e6f76ccd
