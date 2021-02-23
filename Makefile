@@ -20,4 +20,4 @@ test:
 	poetry run coverage run -m  pytest
 
 test-coverage:
-	poetry run coverage json
+	poetry run coverage xml
