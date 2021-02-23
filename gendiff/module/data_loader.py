@@ -1,13 +1,20 @@
 """Provides loader base on the file extendios."""
+import collections
 import json
-import yaml
 from functools import partial
 
-FORMATS_TO_LOADER_MAP = {'.json': json.loads, '.yaml': partial(yaml.load, Loader=yaml.SafeLoader)}
+import yaml
 
-def load(file_path:str):
+DataLoader = collections.namedtuple('DataLoader', ['json', 'yaml'])
+FORMATS_TO_LOADER_MAP = DataLoader(
+    json.loads,
+    partial(yaml.load, Loader=yaml.SafeLoader),
+)
+
+
+def load(file_path: str):
     """
-    Loads data structure from the provided path
+    Load data structure from the provided path.
 
     Args:
         file_path (str): File path.
@@ -15,17 +22,19 @@ def load(file_path:str):
     Returns:
         dict: Data.
     """
-    for format, loader in FORMATS_TO_LOADER_MAP.items():
-        if file_path.endswith(format):
+    for file_format in FORMATS_TO_LOADER_MAP._fields:  # noqa:WPS437
+        if file_path.endswith(file_format):
+            loader = getattr(FORMATS_TO_LOADER_MAP, file_format)
             return loader(open_file(file_path))
     return {}
+
 
 def open_file(file_path):
     """
     Return difference in between two json files.
 
     Args:
-        file_name (str): File path.
+        file_path (str): File path.
 
     Returns:
         string: File full content.
