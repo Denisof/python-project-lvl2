@@ -27,6 +27,8 @@ jobs:
     - name: Test with Pytest
       run: |
         make test
+      run: |
+        make test-coverage
     - name: Publish code coverage
       uses: paambaati/codeclimate-action@v2.7.5
       env:
