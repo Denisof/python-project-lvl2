@@ -1,5 +1,5 @@
 """Diff Entry point."""
-import json
+import gendiff.module.data_loader as data_loader
 from itertools import chain
 
 
@@ -14,27 +14,15 @@ def generate_diff(first_file, second_file):
     Returns:
         string: Difference in string representation.
     """
-    source_json = json.loads(read_file(first_file))
-    compare_json = json.loads(read_file(second_file))
-    diff = get_diff(source_json, compare_json)
+    source_ = data_loader.load(first_file)
+    compare_ = data_loader.load(second_file)
+    diff = get_diff(source_, compare_)
     return '\n'.join(chain('{', diff, '}'))
 
 
-def read_file(file_name):
-    """
-    Return difference in between two json files.
-
-    Args:
-        file_name (str): File path.
-
-    Returns:
-        string: File full content.
-    """
-    with open(file_name) as fl:
-        return fl.read()
 
 
-def get_diff(source_json, compare_json):
+def get_diff(source_, compare_):
     """
     Return difference in between two json files.
 
@@ -46,14 +34,14 @@ def get_diff(source_json, compare_json):
         list: Return List  of strings.
     """
     diff = []
-    for key in sorted(source_json.keys() | compare_json.keys()):
-        if key not in source_json:
-            diff.append(f' + {key}: {compare_json[key]}')
-        elif key not in compare_json:
-            diff.append(f' - {key}: {source_json[key]}')
-        elif source_json[key] == compare_json[key]:
-            diff.append(f'   {key}: {source_json[key]}')
+    for key in sorted(source_.keys() | compare_.keys()):
+        if key not in source_:
+            diff.append(f' + {key}: {compare_[key]}')
+        elif key not in compare_:
+            diff.append(f' - {key}: {source_[key]}')
+        elif source_[key] == compare_[key]:
+            diff.append(f'   {key}: {source_[key]}')
         else:
-            diff.append(f' - {key}: {source_json[key]}')
-            diff.append(f' + {key}: {compare_json[key]}')
+            diff.append(f' - {key}: {source_[key]}')
+            diff.append(f' + {key}: {compare_[key]}')
     return diff

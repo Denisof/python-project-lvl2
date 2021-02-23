@@ -22,7 +22,12 @@ cases = [
     (
         get_fixture_path('flat_1.json'),
         get_fixture_path('flat_2.json'),
-        read(get_fixture_path('flat_result.txt')),
+        read(get_fixture_path('flat_json_result.txt')),
+    ),
+    (
+        get_fixture_path('flat_1.yaml'),
+        get_fixture_path('flat_2.yaml'),
+        read(get_fixture_path('flat_yaml_result.txt')),
     )
 ]
 @pytest.mark.parametrize("file_1,file_2,expected", cases)
