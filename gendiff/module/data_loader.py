@@ -5,10 +5,12 @@ from functools import partial
 
 import yaml
 
-DataLoader = collections.namedtuple('DataLoader', ['json', 'yaml'])
+DataLoader = collections.namedtuple('DataLoader', ['json', 'yaml', 'yml'])
+yml_loader = partial(yaml.load, Loader=yaml.SafeLoader)
 FORMATS_TO_LOADER_MAP = DataLoader(
     json.loads,
-    partial(yaml.load, Loader=yaml.SafeLoader),
+    yml_loader,
+    yml_loader,
 )
 
 

@@ -26,8 +26,8 @@ cases = [
         read(get_fixture_path('flat_json_result.txt')),
     ),
     (
-        get_fixture_path('flat_1.yaml'),
-        get_fixture_path('flat_2.yaml'),
+        get_fixture_path('flat_1.yml'),
+        get_fixture_path('flat_2.yml'),
         'default',
         read(get_fixture_path('flat_yaml_result.txt')),
     ),
@@ -48,6 +48,12 @@ cases = [
         get_fixture_path('nested_2.json'),
         'json',
         read(get_fixture_path('json_nested_result.txt')),
+    ),
+    (
+        get_fixture_path('nested_file1.yml'),
+        get_fixture_path('nested_file2.yml'),
+        'default',
+        read(get_fixture_path('nested_result_yml.txt')),
     ),
 ]
 @pytest.mark.parametrize("file_1,file_2,format,expected", cases)
