@@ -22,14 +22,34 @@ cases = [
     (
         get_fixture_path('flat_1.json'),
         get_fixture_path('flat_2.json'),
+        'default',
         read(get_fixture_path('flat_json_result.txt')),
     ),
     (
         get_fixture_path('flat_1.yaml'),
         get_fixture_path('flat_2.yaml'),
+        'default',
         read(get_fixture_path('flat_yaml_result.txt')),
-    )
+    ),
+    (
+        get_fixture_path('nested_1.json'),
+        get_fixture_path('nested_2.json'),
+        'default',
+        read(get_fixture_path('nested_result.txt')),
+    ),
+    (
+        get_fixture_path('nested_1.json'),
+        get_fixture_path('nested_2.json'),
+        'plain',
+        read(get_fixture_path('plain_nested_result.txt')),
+    ),
+    (
+        get_fixture_path('nested_1.json'),
+        get_fixture_path('nested_2.json'),
+        'json',
+        read(get_fixture_path('json_nested_result.txt')),
+    ),
 ]
-@pytest.mark.parametrize("file_1,file_2,expected", cases)
-def test_flat(file_1, file_2, expected):
-    assert generate_diff(file_1, file_2) == expected
+@pytest.mark.parametrize("file_1,file_2,format,expected", cases)
+def test_diff_generation(file_1, file_2, format, expected):
+    assert generate_diff(file_1, file_2, format) == expected
