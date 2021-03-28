@@ -2,14 +2,14 @@
 
 import json
 
+SELF_NAME = 'json'
 
-def format_diff(source: dict, compare: dict, diff_result: dict):
+
+def format_diff(diff_result: dict):
     """
     Make json string representation of difference result.
 
     Args:
-        source (dict): Dict which is compared.
-        compare (dict): Dict which is compared with.
         diff_result (dict): File path.
 
     Returns:
