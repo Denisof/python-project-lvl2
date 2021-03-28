@@ -4,7 +4,7 @@
 
 import argparse
 
-from gendiff.module.differ import generate_diff
+from gendiff.differ.processor import generate_diff
 
 
 def main():
