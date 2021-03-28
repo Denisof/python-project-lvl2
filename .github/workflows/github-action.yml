@@ -16,7 +16,6 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
-        CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -33,3 +32,4 @@ jobs:
       with:
         coverageCommand: make test-coverage
         debug: true
+        CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
