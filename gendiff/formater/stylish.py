@@ -9,6 +9,13 @@ import gendiff.differ.diff_tree_generator as diff_tree_generator
 REPLACER = ' '
 SPACE_COUNT = 4
 SELF_NAME = 'stylish'
+STATUS_MAPPPER = {
+    diff_tree_generator.STATUS_ADDED: '+',
+    diff_tree_generator.STATUS_REMOVED: '-',
+    diff_tree_generator.STATUS_UNCHANGED: ' ',
+}.get
+DICT_LITTERAL = ('{', '}')
+LIST_LITTERAL = ('[', ']')
 
 
 def format_diff(diff_result: dict):
@@ -47,14 +54,18 @@ def format_diff(diff_result: dict):
                 ),
             )
         return '\n'.join(
-            itertools.chain('{', lines, [current_indent + '}']),  # noqa:WPS336
+            itertools.chain(
+                DICT_LITTERAL[0],
+                lines,
+                [current_indent + DICT_LITTERAL[1]],
+            ),  # noqa:WPS336
         )
 
     return iter_node(diff_result, 0)
 
 
 def process_diff(
-    diff: dict,
+    diff_meta: dict,
     key: str,
     deep_indent: str,
     deep_indent_size: int,
@@ -62,7 +73,7 @@ def process_diff(
     """Process diff.
 
     Args:
-        diff (dict): [description]
+        diff_meta (dict): [description]
         key (str): [description]
         deep_indent (str): [description]
         deep_indent_size (int): [description]
@@ -70,16 +81,75 @@ def process_diff(
     Returns:
         list: List of diff lines
     """
-    diff_lines = []
-    for sign, node_value in diff.items():
-        diff_lines.append(
+    status = diff_meta[diff_tree_generator.STATUS_COLUMN]
+    if status == diff_tree_generator.STATUS_CHANGED:
+        return [
             format_line(
-                get_formated_intend(deep_indent, sign),
+                get_formated_intend(
+                    deep_indent,
+                    STATUS_MAPPPER(diff_tree_generator.STATUS_REMOVED),
+                ),
                 key,
-                stringify(node_value, deep_indent_size),
+                stringify(
+                    diff_meta[diff_tree_generator.VALUE_WAS],
+                    deep_indent_size,
+                ),
             ),
-        )
-    return diff_lines
+            format_line(
+                get_formated_intend(
+                    deep_indent,
+                    STATUS_MAPPPER(diff_tree_generator.STATUS_ADDED),
+                ),
+                key,
+                stringify(
+                    diff_meta[diff_tree_generator.VALUE_IS],
+                    deep_indent_size,
+                ),
+            ),
+        ]
+    if status == diff_tree_generator.STATUS_ADDED:
+        return [
+            format_line(
+                get_formated_intend(
+                    deep_indent,
+                    STATUS_MAPPPER(diff_tree_generator.STATUS_ADDED),
+                ),
+                key,
+                stringify(
+                    diff_meta[diff_tree_generator.VALUE_IS],
+                    deep_indent_size,
+                ),
+            ),
+        ]
+    if status == diff_tree_generator.STATUS_REMOVED:
+        return [
+            format_line(
+                get_formated_intend(
+                    deep_indent,
+                    STATUS_MAPPPER(diff_tree_generator.STATUS_REMOVED),
+                ),
+                key,
+                stringify(
+                    diff_meta[diff_tree_generator.VALUE_WAS],
+                    deep_indent_size,
+                ),
+            ),
+        ]
+    if status == diff_tree_generator.STATUS_UNCHANGED:
+        return [
+            format_line(
+                get_formated_intend(
+                    deep_indent,
+                    STATUS_MAPPPER(diff_tree_generator.STATUS_UNCHANGED),
+                ),
+                key,
+                stringify(
+                    diff_meta[diff_tree_generator.VALUE_IS],
+                    deep_indent_size,
+                ),
+            ),
+        ]
+    return []
 
 
 def format_line(indent: str, key: str, value: str) -> str:  # noqa:WPS110
@@ -96,27 +166,36 @@ def format_line(indent: str, key: str, value: str) -> str:  # noqa:WPS110
     return f'{indent}{key}: {value}'  # noqa:WPS305, WPS110
 
 
-def stringify(current_value: Any, depth: int) -> str:  # noqa:WPS210
+def stringify(cur_value: Any, depth: int) -> str:  # noqa:WPS210
     """Convert passed value to a string.
 
     Args:
-        current_value (Any): Value to stringify
+        cur_value (Any): Value to stringify
         depth (int): Depth of the value in the tree
 
     Returns:
         str: String representation of the value
     """
-    if not isinstance(current_value, dict):
-        if not isinstance(current_value, list):
-            return to_string(current_value)
+    if not isinstance(cur_value, (dict, list)):
+        return to_string(cur_value)
     deep_indent_size, deep_indent, current_indent = get_intends(depth)
     lines = []
-    for key, value in current_value.items():  # noqa:WPS110
+    if isinstance(cur_value, dict):
+        itarable = cur_value.items()
+        left_obj_literal, right_obj_literal = DICT_LITTERAL
+    else:
+        itarable = enumerate(cur_value)
+        left_obj_literal, right_obj_literal = LIST_LITTERAL
+    for key, value in itarable:  # noqa:WPS110
         lines.append(
             format_line(deep_indent, key, stringify(value, deep_indent_size)),
         )
     return '\n'.join(
-        itertools.chain('{', lines, [current_indent + '}']),  # noqa:WPS336
+        itertools.chain(
+            left_obj_literal,
+            lines,
+            [current_indent + right_obj_literal],
+        ),  # noqa:WPS336
     )
 
 

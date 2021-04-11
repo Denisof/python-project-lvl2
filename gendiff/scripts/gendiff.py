@@ -4,7 +4,7 @@
 
 import argparse
 
-from gendiff.differ.processor import generate_diff
+from gendiff.differ.processor import DEFAULT_FORMATER, generate_diff
 
 
 def main():
@@ -20,7 +20,7 @@ def main():
         '--format',
         metavar='FORMAT',
         dest='format',
-        default='default',
+        default=DEFAULT_FORMATER,
         help='set format of output',
     )
     args = parser.parse_args()

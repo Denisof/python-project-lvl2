@@ -5,38 +5,44 @@
             {
                 "key": "follow",
                 "value": {
-                    "+": false
+                    "status": "added",
+                    "value_is": false
                 }
             },
             {
                 "key": "setting1",
                 "value": {
-                    " ": "Value 1"
+                    "status": "unchanged",
+                    "value_is": "Value 1"
                 }
             },
             {
                 "key": "setting2",
                 "value": {
-                    "-": 200
+                    "status": "removed",
+                    "value_was": 200
                 }
             },
             {
                 "key": "setting3",
                 "value": {
-                    "-": true,
-                    "+": null
+                    "status": "changed",
+                    "value_was": true,
+                    "value_is": null
                 }
             },
             {
                 "key": "setting4",
                 "value": {
-                    "+": "blah blah"
+                    "status": "added",
+                    "value_is": "blah blah"
                 }
             },
             {
                 "key": "setting5",
                 "value": {
-                    "+": {
+                    "status": "added",
+                    "value_is": {
                         "key5": "value5"
                     }
                 }
@@ -50,8 +56,9 @@
                             {
                                 "key": "wow",
                                 "value": {
-                                    "-": "",
-                                    "+": "so much"
+                                    "status": "changed",
+                                    "value_was": "",
+                                    "value_is": "so much"
                                 }
                             }
                         ]
@@ -59,13 +66,15 @@
                     {
                         "key": "key",
                         "value": {
-                            " ": "value"
+                            "status": "unchanged",
+                            "value_is": "value"
                         }
                     },
                     {
                         "key": "ops",
                         "value": {
-                            "+": "vops"
+                            "status": "added",
+                            "value_is": "vops"
                         }
                     }
                 ]
@@ -78,23 +87,26 @@
             {
                 "key": "baz",
                 "value": {
-                    "-": "bas",
-                    "+": "bars"
+                    "status": "changed",
+                    "value_was": "bas",
+                    "value_is": "bars"
                 }
             },
             {
                 "key": "foo",
                 "value": {
-                    " ": "bar"
+                    "status": "unchanged",
+                    "value_is": "bar"
                 }
             },
             {
                 "key": "nest",
                 "value": {
-                    "-": {
+                    "status": "changed",
+                    "value_was": {
                         "key": "value"
                     },
-                    "+": "str"
+                    "value_is": "str"
                 }
             }
         ]
@@ -102,7 +114,8 @@
     {
         "key": "group2",
         "value": {
-            "-": {
+            "status": "removed",
+            "value_was": {
                 "abc": 12345,
                 "deep": {
                     "id": 45
@@ -113,7 +126,8 @@
     {
         "key": "group3",
         "value": {
-            "+": {
+            "status": "added",
+            "value_is": {
                 "deep": {
                     "id": {
                         "number": 45
