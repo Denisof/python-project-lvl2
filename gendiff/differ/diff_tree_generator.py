@@ -1,14 +1,16 @@
 """Compare two structures."""
 
 
-from typing import Optional
-
-FLAG_UNCHANGED = ' '
-FLAG_ADDED = '+'
-FLAG_REMOVED = '-'
 NODE_ATTRIBUTE_CHILDREN = 'children'
 NODE_ATTRIBUTE_KEY = 'key'
 NODE_ATTRIBUTE_VALUE = 'value'
+STATUS_COLUMN = 'status'
+STATUS_ADDED = 'added'
+STATUS_REMOVED = 'removed'
+STATUS_CHANGED = 'changed'
+STATUS_UNCHANGED = 'unchanged'
+VALUE_WAS = 'value_was'
+VALUE_IS = 'value_is'
 
 
 def compare_data(source: dict, compare: dict) -> dict:
@@ -25,39 +27,36 @@ def compare_data(source: dict, compare: dict) -> dict:
     for key in sorted(source.keys() | compare.keys()):
         diff = {}
         diff[NODE_ATTRIBUTE_KEY] = key
-        diff_result = get_prop_transition(key, source, compare)
-        if diff_result:
-            diff[NODE_ATTRIBUTE_VALUE] = diff_result
-        else:
+        children.append(diff)
+        if key not in source:
+            diff[NODE_ATTRIBUTE_VALUE] = {
+                STATUS_COLUMN: STATUS_ADDED,
+                VALUE_IS: compare[key],
+            }
+            continue
+        if key not in compare:
+            diff[NODE_ATTRIBUTE_VALUE] = {
+                STATUS_COLUMN: STATUS_REMOVED,
+                VALUE_WAS: source[key],
+            }
+            continue
+        origin_value = source[key]
+        compare_value = compare[key]
+        if origin_value == compare_value:
+            diff[NODE_ATTRIBUTE_VALUE] = {
+                STATUS_COLUMN: STATUS_UNCHANGED,
+                VALUE_IS: origin_value,
+            }
+            continue
+        if isinstance(origin_value, dict) and isinstance(compare_value, dict):
             diff[NODE_ATTRIBUTE_CHILDREN] = compare_data(
                 source[key], compare[key],
             )
-        children.append(diff)
+            continue
 
+        diff[NODE_ATTRIBUTE_VALUE] = {
+            STATUS_COLUMN: STATUS_CHANGED,
+            VALUE_WAS: origin_value,
+            VALUE_IS: compare_value,
+        }
     return children
-
-
-def get_prop_transition(
-    key: str, source: dict, compare: dict,
-) -> Optional[dict]:
-    """Calculate property trasnition.
-
-    Args:
-        key (str): property key
-        source (dict): Source dict
-        compare (dict): Dict to compare
-
-    Returns:
-        Optional[dict]: Result
-    """
-    if key not in source:
-        return {FLAG_ADDED: compare[key]}
-    elif key not in compare:
-        return {FLAG_REMOVED: source[key]}
-    origin_value = source[key]
-    compare_value = compare[key]
-    if origin_value == compare_value:
-        return {FLAG_UNCHANGED: origin_value}
-    elif isinstance(origin_value, dict) and isinstance(compare_value, dict):
-        return None
-    return {FLAG_REMOVED: origin_value, FLAG_ADDED: compare_value}

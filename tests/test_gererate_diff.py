@@ -70,3 +70,11 @@ def test_wrong_extension():
             get_fixture_path("flat_1.txt"), get_fixture_path("flat_1.json")
         )
     assert "Wrong file extension" in str(excinfo.value)
+
+
+def test_wrong_formater():
+    with pytest.raises(ValueError) as excinfo:
+        generate_diff(
+            get_fixture_path("nested_1.yml"), get_fixture_path("nested_2.yml"), 'wrong',
+        )
+    assert "Unknown formater type: wrong" in str(excinfo.value)

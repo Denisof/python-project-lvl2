@@ -1,15 +1,16 @@
 """Provides loader base on the file extendios."""
 import json
+import os
 from functools import partial
 
 import yaml
 
 yml_loader = partial(yaml.load, Loader=yaml.SafeLoader)
-data_loaders = {
-    'json': json.loads,
-    'yaml': yml_loader,
-    'yml': yml_loader,
-}
+GET_LOADER = {
+    '.json': json.loads,
+    '.yaml': yml_loader,
+    '.yml': yml_loader,
+}.get
 
 
 def load(file_path: str):
@@ -24,9 +25,9 @@ def load(file_path: str):
     Returns:
          dict: Data.
     """
-    for file_format in data_loaders.keys():
-        if file_path.split('.')[-1].lower() == file_format:
-            loader = data_loaders[file_format]
-            with open(file_path, 'r') as fl:
-                return loader(fl.read())
+    file_format = os.path.splitext(file_path)[1].lower()
+    loader = GET_LOADER(file_format)
+    if loader:
+        with open(file_path, 'r') as fl:
+            return loader(fl.read())
     raise ValueError('Wrong file extension {0}'.format(file_path))

@@ -23,7 +23,6 @@ def format_diff(diff_result: dict) -> str:
         process_meta,
         formater_iter.iter_node(diff_result, []),
     )
-    filter(bool, diff_lines)
     return '\n'.join(filter(bool, diff_lines))
 
 
@@ -37,75 +36,29 @@ def process_meta(diff_path: list, diff_meta: dict) -> Optional[str]:
     Returns:
         Optional(str): [description]
     """
-    diff_proccessors_chain = [
-        process_changed,
-        process_added,
-        process_removed,
-    ]
-    for processor in diff_proccessors_chain:
-        proccess_result = processor(diff_path, diff_meta)
-        if proccess_result:
-            return proccess_result
+    diff_template = "Property '{0}' was "
+    diff_data = ['.'.join(diff_path)]
+    status = diff_meta[diff_tree_generator.STATUS_COLUMN]
+    if status == diff_tree_generator.STATUS_REMOVED:
+        diff_template += 'removed'  # noqa: WPS336
+        return diff_template.format(*diff_data)
 
-
-def process_changed(diff_path: list, diff_meta: dict) -> Optional[str]:
-    """Process Changed.
-
-    Args:
-        diff_path (list): [description]
-        diff_meta (dict): [description]
-
-    Returns:
-        [type]: [description]
-    """
-    if (diff_tree_generator.FLAG_ADDED in diff_meta):
-        if (diff_tree_generator.FLAG_REMOVED in diff_meta):
-            diff_template = "Property '{0}' was updated. From {1} to {2}"
-            diff_data = ['.'.join(diff_path)]
-            diff_data.append(
-                to_simple(diff_meta.get(diff_tree_generator.FLAG_REMOVED)),
-            )
-            diff_data.append(
-                to_simple(diff_meta.get(diff_tree_generator.FLAG_ADDED)),
-            )
-            return diff_template.format(*diff_data)
-    return None
-
-
-def process_added(diff_path: list, diff_meta: dict) -> Optional[str]:
-    """Process Added.
-
-    Args:
-        diff_path (list): [description]
-        diff_meta (dict): [description]
-
-    Returns:
-        [type]: [description]
-    """
-    if diff_tree_generator.FLAG_ADDED in diff_meta:
-        diff_template = "Property '{0}' was added with value: {1}"
-        diff_data = ['.'.join(diff_path)]
+    if status == diff_tree_generator.STATUS_ADDED:
+        diff_template += 'added with value: {1}'  # noqa: WPS336
         diff_data.append(
-            to_simple(diff_meta.get(diff_tree_generator.FLAG_ADDED)),
+            to_simple(diff_meta[diff_tree_generator.VALUE_IS]),
         )
         return diff_template.format(*diff_data)
-    return None
 
-
-def process_removed(diff_path: list, diff_meta: dict) -> Optional[str]:
-    """Process Removed.
-
-    Args:
-        diff_path (list): [description]
-        diff_meta (dict): [description]
-
-    Returns:
-        [type]: [description]
-    """
-    if diff_tree_generator.FLAG_REMOVED in diff_meta:
-        diff_template = "Property '{0}' was removed"
-        return diff_template.format('.'.join(diff_path))
-    return None
+    if status == diff_tree_generator.STATUS_CHANGED:
+        diff_template += 'updated. From {1} to {2}'  # noqa: WPS336
+        diff_data.extend(
+            [
+                to_simple(diff_meta[diff_tree_generator.VALUE_WAS]),
+                to_simple(diff_meta[diff_tree_generator.VALUE_IS]),
+            ],
+        )
+        return diff_template.format(*diff_data)
 
 
 def to_simple(subject: Any) -> str:
@@ -117,11 +70,11 @@ def to_simple(subject: Any) -> str:
     Returns:
         str: Formated object
     """
-    if not isinstance(subject, dict):
-        if isinstance(subject, str):
-            return "'{0}'".format(subject)
-        return to_string(subject)
-    return '[complex value]'
+    if isinstance(subject, (dict, list)):
+        return '[complex value]'
+    if isinstance(subject, str):
+        return "'{0}'".format(subject)
+    return to_string(subject)
 
 
 def to_string(subject: Union[str, int, bool, None, float]):
